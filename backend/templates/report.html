@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; }
+        .header { background: #0d6efd; color: white; padding: 20px; text-align: center; border-radius: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f8fafc; }
+        .summary { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>MedSync Pro - Monthly Performance Report</h1>
+        <p>Doctor: Dr. {{ doctor_name }} | Month: {{ month_name }}</p>
+    </div>
+
+    <div class="summary">
+        Total Appointments Completed: {{ appointments|length }}
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Patient Name</th>
+                <th>Diagnosis</th>
+                <th>Prescription</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appt in appointments %}
+            <tr>
+                <td>{{ appt.date }}</td>
+                <td>{{ appt.patient_name }}</td>
+                <td>{{ appt.diagnosis }}</td>
+                <td>{{ appt.prescription }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p style="margin-top: 30px; font-size: 12px; color: #777;">
+        This is an automated system generated report by MedSync Pro.
+    </p>
+</body>
+</html>
