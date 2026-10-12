@@ -1,8 +1,10 @@
 Flask==3.0.0
+gunicorn==23.0.0
 Werkzeug==3.0.1
 
 Flask-SQLAlchemy==3.1.1
 SQLAlchemy==2.0.23
+psycopg[binary]==3.2.3
 
 Flask-JWT-Extended==4.6.0
 PyJWT==2.8.0

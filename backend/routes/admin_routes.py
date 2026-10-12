@@ -3,6 +3,9 @@ from models import db,User,Doctor,Patient,Appointment,Department,Treatment
 from routes.auth import authorization 
 from extensions import cache
 from tasks import send_welcome_email
+from datetime import datetime, timedelta
+import hashlib
+import secrets
 
 
 
@@ -70,6 +73,9 @@ def add_doct():
             return jsonify(msg=str(e)), 400
         
         new_user.set_pass(password=password)
+        setup_token = secrets.token_urlsafe(32)
+        new_user.password_setup_token_hash = hashlib.sha256(setup_token.encode()).hexdigest()
+        new_user.password_setup_expires_at = datetime.utcnow() + timedelta(hours=24)
         db.session.add(new_user)
         db.session.flush()
 
@@ -80,9 +86,9 @@ def add_doct():
         db.session.commit()
         cache.clear()
 
-        send_welcome_email.delay(email=data.get('username'),name=data.get('name'),password=data.get('password'))
+        send_welcome_email.delay(email=data.get('username'), name=data.get('name'), setup_token=setup_token)
 
-        return jsonify({"msg":"Doctor registered successfully and credentials emailed"}),201
+        return jsonify({"msg":"Doctor registered successfully; an account setup email was queued"}),201
     
 @admin_bp.route("/get-doctor/<int:id>")
 @authorization("admin")

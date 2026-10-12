@@ -90,6 +90,7 @@ def patient_history(pat_id):
 
     treatments = Treatment.query.join(Appointment).filter(
         Appointment.patient_id == pat_id,
+        Appointment.doctor_id == user.doctor.id,
     ).all()
 
     data = []

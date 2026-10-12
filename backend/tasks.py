@@ -1,21 +1,28 @@
 from extensions import celery_app, mail
 from flask_mail import Message
 from models import Appointment, Doctor, Treatment
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from io import StringIO
 import csv
 from flask import render_template
+import os
+from datetime import datetime, timezone
 
 
 @celery_app.task
-def send_welcome_email(email, name, password):
+def send_welcome_email(email, name, setup_token):
+    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:8080").rstrip("/")
+    setup_url = f"{frontend_url}/set-password?token={setup_token}"
     msg = Message(
         subject="Welcome to MedSyncPro",
         recipients=[email],
         body=f"""Dear {name},
 
 Username: {email}
-Password: {password}
+
+Please use the account setup link provided by the administrator to choose your password.
+
+Set your password here: {setup_url}
 
 Regards,
 MedSyncPro"""
@@ -82,8 +89,8 @@ def doc_monthly_reports():
                 report_data.append({
                 "date": a.appointment_date.strftime("%d-%m-%Y"),
                 "patient_name": a.patient.name,
-                "diagnosis": a.treatment[0].diagnosis,
-                "prescription": a.treatment[0].prescription
+                "diagnosis": a.treatment.diagnosis,
+                "prescription": a.treatment.prescription
     })
 
         html = render_template(

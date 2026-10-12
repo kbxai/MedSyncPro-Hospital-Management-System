@@ -1,0 +1,11 @@
+.git
+.env
+backend/.env
+backend/env
+backend/instance
+backend/*.sqlite3
+backend/celerybeat-schedule.*
+frontend/node_modules
+frontend/dist
+__pycache__
+*.pyc
