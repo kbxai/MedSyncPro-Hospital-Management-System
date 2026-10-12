@@ -3,6 +3,8 @@ from models import db,User,Patient
 from flask_jwt_extended import create_access_token,get_jwt,verify_jwt_in_request
 from functools import wraps
 from datetime import timedelta
+from datetime import datetime
+import hashlib
 import re
 import os
 
@@ -10,7 +12,7 @@ auth_bp = Blueprint('auth',__name__)
 
 @auth_bp.route('/login',methods=['POST'])
 def login():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     username = data.get('username')
     password = data.get('password')
 
@@ -39,10 +41,10 @@ def login():
 
 @auth_bp.route('/signup',methods=['POST'])
 def signup():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     username = data.get('username')
 
-    if not re.match(r"[^@]+@[^@]+\.[^@]+", username):
+    if not isinstance(username, str) or not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", username):
          return jsonify(msg="Username must be a valid email address"), 400
 
     admin_username = os.getenv('user_name') or 'admin'
@@ -91,7 +93,33 @@ def signup():
             return jsonify({"msg":"Patient registered successfully"}),201
         except Exception:
             db.session.rollback()
+            auth_bp.logger.exception("Patient registration failed")
             return jsonify(msg="Database error occurred during registration"), 500
+
+
+@auth_bp.route('/set-password', methods=['POST'])
+def set_password():
+    data = request.get_json(silent=True) or {}
+    token = data.get('token')
+    password = data.get('password')
+    if not isinstance(token, str) or not isinstance(password, str):
+        return jsonify(msg="Token and password are required"), 400
+
+    token_hash = hashlib.sha256(token.encode()).hexdigest()
+    user = User.query.filter_by(password_setup_token_hash=token_hash).first()
+    if not user or not user.password_setup_expires_at or user.password_setup_expires_at < datetime.utcnow():
+        return jsonify(msg="Setup link is invalid or expired"), 400
+
+    try:
+        user.validate_password(password)
+    except ValueError as error:
+        return jsonify(msg=str(error)), 400
+
+    user.set_pass(password)
+    user.password_setup_token_hash = None
+    user.password_setup_expires_at = None
+    db.session.commit()
+    return jsonify(msg="Password set successfully"), 200
 
 
 def authorization(roles):

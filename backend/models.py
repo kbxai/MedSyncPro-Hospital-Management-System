@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash,check_password_hash
 import re
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -8,6 +9,8 @@ class User(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     username = db.Column(db.String(80),unique=True,nullable=False)
     password = db.Column(db.String(200),nullable=False)
+    password_setup_token_hash = db.Column(db.String(128), nullable=True, unique=True)
+    password_setup_expires_at = db.Column(db.DateTime, nullable=True)
 
     def set_pass(self,password):
         self.password = generate_password_hash(password)
@@ -87,4 +90,3 @@ class Treatment(db.Model):
     notes = db.Column(db.String(100))
 
     appointment = db.relationship('Appointment',backref='treatment',uselist=False)
-

@@ -57,6 +57,39 @@ MedSyncPro is a web-based hospital management system designed to facilitate oper
 -   **HTTP Client**: Axios
 -   **Styling**: Bootstrap 5
 
+## Production-grade demo deployment
+
+The repository includes a Docker Compose topology for synthetic/demo data:
+
+```text
+PostgreSQL + Redis + Gunicorn Flask API + Celery worker + Celery Beat + Nginx/Vue SPA
+```
+
+1. Copy the root `.env.example` to a deployment-only `.env` beside
+   `docker-compose.yml`. The Compose file reads this root `.env`; do not use
+   `backend/.env` for the server deployment.
+2. Set strong random values for `JWT_SECRET_KEY`, `POSTGRES_PASSWORD`, and
+   `ADMIN_BOOTSTRAP_PASSWORD`; never commit them.
+3. Set the mail provider values and `FRONTEND_URL` to the deployed HTTPS origin.
+4. Build and start the stack:
+
+   ```bash
+   docker compose up --build -d
+   ```
+
+5. Verify `/healthz`, `/readyz` through the frontend host, then verify login, booking,
+   treatment, export, and mail delivery. The Nginx frontend container proxies the two
+   health endpoints to Flask.
+
+The containers use `restart: unless-stopped`, so the stack starts again after a VM
+reboot or an individual container failure. Check the resulting state with
+`docker compose ps` and inspect failures with `docker compose logs SERVICE_NAME`.
+
+The stack is intended for academic/demo use with synthetic data. It is not a claim of
+clinical, HIPAA, GDPR, or other regulatory compliance. Use managed backups, restricted
+network access, TLS, dependency updates, and an operational restore test before sharing
+the deployment.
+
 ## System Architecture
 
 -   **Client-Server**: Frontend SPA communicates with Backend REST API.

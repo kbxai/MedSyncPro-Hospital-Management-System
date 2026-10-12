@@ -18,10 +18,12 @@ import { notify } from '../ui/notify';
 import PatientHistory from '@/views/Doctor/PatientHistory.vue';
 import UpdateProfile from '@/views/Patient/UpdateProfile.vue';
 import UpdateAvailability from '@/views/Doctor/UpdateAvailability.vue';
+import SetPassword from '../views/SetPassword.vue';
 
 const routes = [
   { path: '/login', component: Login },
   { path: '/signup', component: Signup },
+  { path: '/set-password', component: SetPassword },
   
   { path: '/admin', component: AdminDashboard, meta: { requiresAuth: true, role: 'admin' } },
   { path: '/admin/view-doctors', component: ViewDoctors, meta: { requiresAuth: true, role: 'admin' } },
