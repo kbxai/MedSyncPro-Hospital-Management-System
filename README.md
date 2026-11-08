@@ -1,5 +1,15 @@
 # MedSyncPro - Hospital Management System V2
 
+| | |
+|---|---|
+| **What it does** | Hospital appointment management with admin, doctor and patient roles |
+| **Context** | IITM Modern Application Development 2 (MAD-2) coursework |
+| **Stack** | Flask, Vue.js, Celery and Redis, JWT, SQLAlchemy, Docker Compose |
+| **Highlights** | Role-based access; server-side double-booking checks on booking and rescheduling; Celery Beat jobs for daily reminders (08:00) and a monthly report (day 1, 02:00, Asia/Kolkata) |
+| **Known limitations** | No automated tests yet |
+| **Built with** | AI coding tools (Claude Code, Google Antigravity) |
+
+
 MedSyncPro is a web-based hospital management system designed to facilitate operations between administrators, doctors, and patients. The system implements Role-Based Access Control (RBAC) and utilizes asynchronous processing for background tasks.
 
 ## Features
